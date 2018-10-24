@@ -25,10 +25,8 @@ public class RegistrationActivity extends AppCompatActivity {
     private Button mRegistration;
     private EditText mEmail, mPassword, mName;
 
-
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
