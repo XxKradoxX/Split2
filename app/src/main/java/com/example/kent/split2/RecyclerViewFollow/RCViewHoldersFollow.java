@@ -7,11 +7,11 @@ import android.widget.TextView;
 
 import com.example.kent.split2.R;
 
-public class RcViewHolders extends RecyclerView.ViewHolder{
+public class RCViewHoldersFollow extends RecyclerView.ViewHolder{
     public TextView mEmail;
     public Button mFollow;
 
-    public RcViewHolders(View itemView){
+    public RCViewHoldersFollow(View itemView){
         super(itemView);
         mEmail = itemView.findViewById(R.id.email);
         mFollow = itemView.findViewById(R.id.follow);

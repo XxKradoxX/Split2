@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseArray;
@@ -19,6 +20,8 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.File;
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class ShowCaptureActivity extends AppCompatActivity {
     public static ArrayList<Line> totalComponents = new ArrayList<Line>();
     public static ArrayList<List<Line>> lines = new ArrayList<List<Line>>();
     public static List<Product> itemsBought = new ArrayList<>();
+    Reciept mReciept;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class ShowCaptureActivity extends AppCompatActivity {
             Bitmap rotateBitmap = rotate(decodedBitmap);
 
             imageView.setImageBitmap(rotateBitmap);
+            getTextFromImage(rotateBitmap);
 
         }
 
@@ -50,9 +55,19 @@ public class ShowCaptureActivity extends AppCompatActivity {
         mSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ChooseRecieverActivity.class);
+
+                ArrayList<String> data = new ArrayList<>();
+
+                for (int i =0; i < mReciept.getItems().size(); i++) {
+                    System.out.println("shiba"+mReciept.getItems().get(i).getName());
+                    data.add(mReciept.getItems().get(i).getName());
+                    data.add(String.valueOf(mReciept.getItems().get(i).getPrice()));
+                }
+
+                Intent intent = new Intent(getApplicationContext(), ReviewRecieptActivity.class);
+                intent.putExtra("data",data);
                 startActivity(intent);
-                return;
+
             }
         });
 
@@ -67,7 +82,7 @@ public class ShowCaptureActivity extends AppCompatActivity {
         return Bitmap.createBitmap(decodedBitmap,0,0,w,h,matrix,true);
     }
 
-    private void getTextFromImage(Bitmap picture) {
+    private void getTextFromImage(final Bitmap picture) {
 
         TextRecognizer textRecognizer = new TextRecognizer.Builder(this.getApplicationContext()).build();
 
@@ -96,10 +111,12 @@ public class ShowCaptureActivity extends AppCompatActivity {
             @Override
             public void run() {
                 List<Integer> indexHistory = new ArrayList<Integer>();
+                List<Line> history=new ArrayList<Line>();
                 indexHistory.clear();
 
                 for (int i = 0; i < totalComponents.size(); i++) {
-                    if (!indexHistory.contains(i)) {
+                    if (!history.contains(totalComponents.get(i))) {
+                        history.add(totalComponents.get(i));
                         List<Line> currentLine = new ArrayList<Line>();
                         Line line_1 = totalComponents.get(i);
                         currentLine.add(line_1);
@@ -115,61 +132,87 @@ public class ShowCaptureActivity extends AppCompatActivity {
                             int yMin_2 = line_2.getCornerPoints()[3].y;
                             if (!((left_1 < right_2 && left_1 > left_2) || (right_1 > left_2 && right_1 < right_2)) &&
                                     (yMid_1 < yMin_2 && yMid_1 > yMax_2) &&
-                                    (!indexHistory.contains(a))) {
+                                    (!history.contains(line_2))) {
                                 currentLine.add(line_2);
-                                indexHistory.add(a);
+                                history.add(line_2);
                             }
                         }
                         lines.add(currentLine);
                     }
 
                 }
-                StringBuilder output = new StringBuilder();
+                for (int i = 0; i < lines.size(); i++) {
+                    List<Line> line = lines.get(i);
+
+                    String lineString = "";
+                    for (int a = 0; a < line.size(); a++) {
+                        lineString += " " + line.get(a).getValue();
+                    }
+                }
+
+
                 // Scans through text to find product name and price
                 for (int i = 0; i < lines.size(); i++) {
                     List<Line> line = lines.get(i);
-                    String lineString = line.toString();
+
+                    String lineString = "";
+                    for (int a =0; a < line.size(); a++) {
+                        lineString += " " + line.get(a).getValue();
+                    }
+
                     String priceString = "";
                     String name = "";
 
                     if (checkForPrice(lineString)) {
+                        System.out.println("Contains { " + lineString);
                         int a = 0;
                         int b = 0;
                         boolean isPrice = false;
-                        for (a = 0; a < line.size(); a++) {
-                            String text = line.get(a).getValue();
-                            if (Character.isDigit(text.charAt(a))) {
-                                for (b = a;  b < text.length(); b++) {
-                                    if (text.charAt(b) == '.') {
-                                        isPrice = true;
-                                    }
-                                    if (!Character.isDigit(text.charAt(b)) && text.charAt(b) != ',') {
-                                        break;
-                                    }
-                                }
-                                if (isPrice) {
-                                    for (int d = a; d < b && d < text.length(); d++) {
-                                        if (text.charAt(d) != ',') {
-                                            priceString = priceString + text.charAt(d);
+                        boolean priceFound = false;
+
+                        for (a = 0; a < lineString.length() && !isPrice; a++) {
+
+                            if (Character.isDigit(lineString.charAt(a))) {
+                                for (b = a;  b < lineString.length(); b++) {
+                                    if (!priceFound) {
+                                        if (!Character.isDigit(lineString.charAt(b)) && !isPrice && lineString.charAt(b) != '.'){
+                                            isPrice = false;
+                                            break;
+                                        }
+                                        if (lineString.charAt(b) == '.' && !isPrice) {
+                                            isPrice = true;
+                                        } else if (!Character.isDigit(lineString.charAt(b)) && lineString.charAt(b) != ',' && isPrice) {
+                                            priceFound = true;
+                                            break;
                                         }
                                     }
-                                    double price = Double.parseDouble(priceString);
+                                }
+                                for (int d = a; d < b ; d++) {
+                                    if (lineString.charAt(d) != ',') {
+                                        priceString = priceString + lineString.charAt(d);
+                                    }
+                                }
+                                double price = Double.parseDouble(priceString);
 
-                                    for (int c = 0; c < line.size(); c++) {
+                                if (a-1 > lineString.length()/2) {
+                                    for (int c = 0; c < a-1; c++) {
                                         if (c != i) {
-                                            name += line.get(c).getValue();
+                                            name += lineString.charAt(c);
                                         }
                                     }
-                                    Product p = new Product(name,price,line);
-                                    itemsBought.add(p);
-                                    break;
+                                } else {
+                                    for (int c = b; c < lineString.length(); c++) {
+                                        name += lineString.charAt(c);
+                                    }
                                 }
+                                Product p = new Product(name,price,line);
+                                itemsBought.add(p);
+                                break;
                             }
-
                         }
-
                     }
                 }
+                mReciept = new Reciept(itemsBought,picture);
 
             }
         };
@@ -181,7 +224,8 @@ public class ShowCaptureActivity extends AppCompatActivity {
 
     public static boolean checkForPrice(String s) {
 
-        if (!s.matches(".*\\d+.*")) {
+        if (s.matches(".*\\d+.*")) {
+
             for (int i = 0; i < s.length()-2; i++) {
                 if (Character.isDigit(s.charAt(i))) {
                     if (s.charAt(i+1) == '.' && Character.isDigit(s.charAt(i+2))) {

@@ -6,11 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.kent.split2.RecyclerViewFollow.RCAdapter;
+import com.example.kent.split2.RecyclerViewFollow.RCAdapterFollow;
 import com.example.kent.split2.RecyclerViewFollow.UsersObject;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -21,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FindUsersActivity extends AppCompatActivity {
 
@@ -43,7 +40,7 @@ public class FindUsersActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getApplication());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new RCAdapter(getDataSet(),getApplication());
+        mAdapter = new RCAdapterFollow(getDataSet(),getApplication());
         mRecyclerView.setAdapter(mAdapter);
 
         mInput.addTextChangedListener(new TextWatcher() {

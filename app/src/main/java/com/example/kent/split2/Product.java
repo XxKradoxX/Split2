@@ -8,9 +8,16 @@ public class Product {
     private String name;
     private double price;
     private double positionOfPrice;
+    private boolean isTax = false;
     private List<Line> raw;
 
     Product(String name, double price, List<Line> raw) {
+        this.name = name;
+        this.price = price;
+        this.raw = raw;
+    }
+
+    Product(String name, double price) {
         this.name = name;
         this.price = price;
         this.raw = raw;
@@ -24,10 +31,13 @@ public class Product {
         return price;
     }
 
+    public void setAsTax() {
+        this.isTax = true;
+    }
+
     public void setPrice(double newPrice) {
         price = newPrice;
     }
-
 
     public double getPositionOfPrice() {
         return positionOfPrice;

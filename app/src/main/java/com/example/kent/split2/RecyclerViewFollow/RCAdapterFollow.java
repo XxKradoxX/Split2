@@ -14,26 +14,26 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
-public class RCAdapter extends RecyclerView.Adapter<RcViewHolders>{
+public class RCAdapterFollow extends RecyclerView.Adapter<RCViewHoldersFollow>{
 
     private List<UsersObject> usersList;
     private Context context;
 
-    public RCAdapter(List<UsersObject> usersList, Context context){
+    public RCAdapterFollow(List<UsersObject> usersList, Context context){
         this.usersList = usersList;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public RcViewHolders onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RCViewHoldersFollow onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_friends_item, null);
-        RcViewHolders rcv = new RcViewHolders(layoutView);
+        RCViewHoldersFollow rcv = new RCViewHoldersFollow(layoutView);
         return rcv;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RcViewHolders holder, int position) {
+    public void onBindViewHolder(@NonNull final RCViewHoldersFollow holder, int position) {
         holder.mEmail.setText(usersList.get(position).getEmail());
         if(UserInformation.listFollowing.contains(usersList.get(holder.getLayoutPosition()).getUid())){
             holder.mFollow.setText("following");
