@@ -22,6 +22,10 @@ public class RCAdapterReciept extends RecyclerView.Adapter<RcViewHoldersReciept>
     private List<Product> productList;
     private Context context;
 
+    public interface OnClickL {
+        public boolean onItemLongClicked(int position);
+    }
+
     public RCAdapterReciept(List<Product> productList, Context context){
         this.productList = productList;
         this.context = context;
@@ -41,7 +45,28 @@ public class RCAdapterReciept extends RecyclerView.Adapter<RcViewHoldersReciept>
         System.out.println("dam" + current.getName());
         holder.mName.setText(current.getName());
         holder.mPrice.setText(Double.toString(current.getPrice()));
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(context, holder.itemView);
+                popupMenu.inflate(R.menu.reciept_option_menu);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_item_delete:
+                                productList.remove(position);
+                                notifyDataSetChanged();
+                                break;
+                            case R.id.menu_item_tax:
+                                productList.get(position).setAsTax();
+                                notifyDataSetChanged();
+                        }
+                        return false;
+                    }
+                });
+            }
+/*
             @Override
             public boolean onLongClick(View v) {
                 PopupMenu popupMenu = new PopupMenu(context, holder.itemView);
@@ -62,7 +87,7 @@ public class RCAdapterReciept extends RecyclerView.Adapter<RcViewHoldersReciept>
                     }
                 });
                 return false;
-            }
+            } */
         });
     }
 

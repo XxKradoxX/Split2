@@ -149,8 +149,6 @@ public class ShowCaptureActivity extends AppCompatActivity {
                         lineString += " " + line.get(a).getValue();
                     }
                 }
-
-
                 // Scans through text to find product name and price
                 for (int i = 0; i < lines.size(); i++) {
                     List<Line> line = lines.get(i);
@@ -170,10 +168,10 @@ public class ShowCaptureActivity extends AppCompatActivity {
                         boolean isPrice = false;
                         boolean priceFound = false;
 
-                        for (a = 0; a < lineString.length() && !isPrice; a++) {
+                        for (a = lineString.length()-1; a >=0  && !isPrice; a--) {
 
                             if (Character.isDigit(lineString.charAt(a))) {
-                                for (b = a;  b < lineString.length(); b++) {
+                                for (b = a;  b >= 0; b--) {
                                     if (!priceFound) {
                                         if (!Character.isDigit(lineString.charAt(b)) && !isPrice && lineString.charAt(b) != '.'){
                                             isPrice = false;
@@ -187,7 +185,7 @@ public class ShowCaptureActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
-                                for (int d = a; d < b ; d++) {
+                                for (int d = b+1; d <=a ; d++) {
                                     if (lineString.charAt(d) != ',') {
                                         priceString = priceString + lineString.charAt(d);
                                     }
@@ -201,7 +199,7 @@ public class ShowCaptureActivity extends AppCompatActivity {
                                         }
                                     }
                                 } else {
-                                    for (int c = b; c < lineString.length(); c++) {
+                                    for (int c = a+1; c < lineString.length(); c++) {
                                         name += lineString.charAt(c);
                                     }
                                 }
