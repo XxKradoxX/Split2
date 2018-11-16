@@ -19,5 +19,11 @@
         android:text="Register"
         android:id="@+id/registration"/>
 
+    <com.google.android.gms.common.SignInButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/googleBtn"
+        ></com.google.android.gms.common.SignInButton>
+
 
 </LinearLayout>

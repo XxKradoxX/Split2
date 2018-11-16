@@ -8,9 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MainActivity extends AppCompatActivity {
 
     FragmentPagerAdapter adapterViewPager;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
 
     private void hideSystemUI() {
         // Enables regular immersive mode.
